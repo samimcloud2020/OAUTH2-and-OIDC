@@ -84,3 +84,139 @@ Click Fetch Protected Data: Sends Authorization: Bearer <access_token> to /api/a
 Click Log Out: Clears localStorage and resets the UI.
 
 ************************************************************************************************
+###Here is the decoded payload from your JWT id_token:
+
+###Decoded Token Header & Payload
+### id_token
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYW11bmEiLCJuYW1lIjoiamFtdW5hIHBhdGVsIiwiZW1haWwiOiJqYW11bmExMDAwQGdtYWlsLmNvbSIsImV4cCI6MTc5MDE4NjIxMX0.2GEFh1jf2YhiCOaPG0JE1jU4Tprl4vXXHJyBgy7mKiY
+
+{
+  "Header": {
+    "alg": "HS256",
+    "typ": "JWT"
+  },
+  "Payload": {
+    "sub": "jamuna",
+    "name": "jamuna patel",
+    "email": "jamuna1000@gmail.com",
+    "exp": 1790186211
+  }
+}
+
+
+| Field | Value | Meaning |
+| :--- | :--- | :--- |
+| **`sub`** | `jamuna` | Subject (User ID / Username) |
+| **`name`** | `jamuna patel` | Full name of the user |
+| **`email`** | `jamuna1000@gmail.com` | User's email address |
+| **`exp`** | `1790186211` | Expiration Time (Unix Timestamp) |
+**********************************************************************************
+###Here is the decoded header and payload for your access_token:
+
+###Decoded Token Header & Payload
+### access_token
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYW11bmEiLCJzY29wZXMiOlsicmVhZDphZ2VudCJdLCJleHAiOjE3OTAxODYyMTF9.aNKJRnk_cMM7AREUOwUbwEe3alnH7g4D56QjbXoApus
+
+{
+  "Header": {
+    "alg": "HS256",
+    "typ": "JWT"
+  },
+  "Payload": {
+    "sub": "jamuna",
+    "scopes": [                    <------------------------
+      "read:agent"
+    ],
+    "exp": 1790186211
+  }
+}
+
+| Field | Value | Meaning |
+| :--- | :--- | :--- |
+| **`sub`** | `jamuna` | Subject (User ID / Username) |
+| **`scopes`** | `["read:agent"]` | Granted permissions / scopes |
+| **`exp`** | `1790186211` | Expiration Time (Unix Timestamp) |
+
+********************************************************************
+# main.py
+
+@app.post("/token")
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: sqlite3.Connection = Depends(get_db)):
+    ...
+    # OAuth2 Access Token (Authorization)
+    access_token = jwt.encode({
+        "sub": db_user["username"],
+        "scopes": ["read:agent"],  # <--- HERE IS WHERE THE SCOPE IS HARDCODED / GIVEN!
+        "exp": now + timedelta(hours=1)
+    }, SECRET_KEY, algorithm=ALGORITHM)
+
+    return {
+        "id_token": id_token,
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+
+1. Who gives this permission?
+Your FastAPI Auth Server (specifically your POST /token or /login endpoint) issues and grants this permission.
+
+When the client requests an access_token during login, your server checks the user's role or scope request,
+signs the JWT with your SECRET_KEY, and bakes ["read:agent"] directly into the token's payload.
+
+| Scope | Permission Level | Allowed Actions |
+| :--- | :--- | :--- |
+| **`read:agent`** | Read-Only | View agent status, fetch agent response, read logs |
+| **`write:agent`** | Read & Write | Create/Update agents, modify settings, delete agents |
+
+**************************************************************************************************
+
+jwt.encode() is the function that generates and cryptographically signs the JWT string on your server.
+
+Without jwt.encode(), your server would just be sending a plain, unverified JSON object over the network that anyone could modify or forge.
+
+What jwt.encode() Does (The 3 Parts)
+When you call:
+
+access_token = jwt.encode(
+    {"sub": "jamuna", "scopes": ["read:agent"]}, 
+    SECRET_KEY, 
+    algorithm="HS256"
+)
+
+###It takes three pieces of data and turns them into the string you saw (eyJhbGci...):
+
+**Header (Part 1):** Sets the algorithm used (HS256).
+
+**Payload (Part 2):** Converts your Python dictionary (sub, scopes, exp) into Base64-encoded JSON.
+
+**Signature (Part 3):** Takes Parts 1 & 2, runs them through the HS256 hashing algorithm along with your SECRET_KEY,
+and generates a unique signature.
+
+jwt.encode() = Base64(Header) + "." + Base64(Payload) + "." + Signature(Header + Payload + SECRET_KEY)
+*******************************************************************************************************
+
+### Why is jwt.encode() Necessary?
+**1. Tamper Prevention (Tamper-Proofing)**
+Anyone can decode the payload of a JWT using Base64 (as we did earlier). However,
+no one can change the payload (e.g., changing "sub": "jamuna" to "sub": "admin") without invalidating the Signature created by jwt.encode().
+
+When the request hits /api/agent, jwt.decode() checks the signature against SECRET_KEY. If someone edited the payload, jwt.decode() throws an error and rejects the request.
+
+**2. Stateless Verification**
+Because all permissions (scopes), expiration times (exp), and identity details (sub) are signed inside the encoded string:
+
+The client holds the token in localStorage.
+
+The server doesn't need to ask SQLite, "Is Jamuna logged in?" on every single HTTP request.
+
+It simply verifies the signature created by jwt.encode().
+
+**3. Compact Transport**
+jwt.encode() compresses the JSON payload into a single, URL-safe string that easily fits inside an HTTP Header (Authorization: Bearer <token>).
+
+**************************************************************************
+
+
+
+
+
