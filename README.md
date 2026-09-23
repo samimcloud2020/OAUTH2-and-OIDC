@@ -1,13 +1,14 @@
-1. Different Audiences (The Security Boundary)
+### 1. Different Audiences (The Security Boundary)
 
-┌─────────────────┐
-                  │   id_token      │  ──> Consumed by Client App (app.js)
-                  │ (Authentication)│      Audience: Your App / Frontend
+```text
+                  ┌─────────────────┐
+                  │    id_token     │ ──> Consumed by Client App (app.js)
+                  │ (Authentication)│     Audience: Your App / Frontend
                   └─────────────────┘
  [ Login Server ]
                   ┌─────────────────┐
-                  │  access_token   │  ──> Consumed by API / Resource Server (/api/agent)
-                  │ (Authorization) │      Audience: Your Backend / Microservices
+                  │  access_token   │ ──> Consumed by API / Resource Server (/api/agent)
+                  │ (Authorization) │     Audience: Your Backend / Microservices
                   └─────────────────┘
 ****************************************************************************************************
 id_token: The audience (aud claim) is the Client Application (app.js). Its job is to tell the frontend 
