@@ -52,16 +52,18 @@ frontend to impersonate the user.
 
 *********************************************************************************************************
 
-### Token Comparison: `id_token` vs. `access_token`
+### Token Comparison: `id_token` vs `access_token`
 
-| Comparison Feature | `id_token` (Identity / Authentication) | `access_token` (Permissions / Authorization) |
-
-| **Protocol Layer** | **OpenID Connect (OIDC)**              | **OAuth 2.0** |
-| **Who Reads It?** | **Frontend Client** (`app.js`)          | **Backend API** (`/api/agent`) |
-| **Core Question** | *"Who is the user currently logged in?"* | *"What is this application allowed to do?"* |
-| **Key Payload Contents** | Profile info (`sub`, `username`, `email`, `auth_time`) | Permissions & scopes (`read:agent`, `write:prompt`) |
-| **Token Structure** | **Must** be a cryptographically signed **JWT** | Opaque random string **OR** signed JWT |
-| **Primary Usage** | Decoded client-side to render user profile & UI state | Sent in `Authorization: Bearer <token>` header |
-| **Security Scope** | Shared safely with the frontend application | Kept secret from end-user inspection; validated by API |
+| Feature | `id_token` | `access_token` |
+|---|---|---|
+| **Purpose** | Identity / Authentication | Permission / Authorization |
+| **Protocol** | OpenID Connect (OIDC) | OAuth 2.0 |
+| **Who Reads It?** | Client / Frontend (`app.js`) | Resource Server / API (`/api/agent`) |
+| **Core Question** | *"Who is the logged-in user?"* | *"What resources can be accessed?"* |
+| **Target Audience (`aud`)** | Client Application ID | API Endpoint / Service Identifier |
+| **Payload Contents** | User profile (`sub`, `name`, `email`) | Scopes & roles (`read:agent`, `write:prompt`) |
+| **Format** | Must be a signed JWT | Opaque string or JWT |
+| **Usage** | Decoded client-side to render UI | Sent in `Authorization: Bearer <token>` header |
+| **Handling** | Inspected by frontend | Passed along transparently by frontend |
 
 ********************************************************************************************************************
