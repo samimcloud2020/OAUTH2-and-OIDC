@@ -11,10 +11,10 @@
                   │ (Authorization) │     Audience: Your Backend / Microservices
                   └─────────────────┘
 ****************************************************************************************************
-## id_token: The audience (aud claim) is the Client Application (app.js). Its job is to tell the frontend 
+### id_token: The audience (aud claim) is the Client Application (app.js). Its job is to tell the frontend 
           "Here is who just logged in."
 
-## access_token: The audience is the Resource Server (API). Its job is to tell backend endpoints "The holder 
+### access_token: The audience is the Resource Server (API). Its job is to tell backend endpoints "The holder 
             of this token has permission to access this resource."
 *********************************************************************************************
 ##Opaque Access Tokens vs. Transparent ID Tokens
