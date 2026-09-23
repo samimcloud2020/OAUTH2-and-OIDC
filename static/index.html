@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FastAPI + LangGraph + OpenAI</title>
+    <style>
+        body { font-family: sans-serif; margin: 2rem; max-width: 600px; }
+        .card { border: 1px solid #ccc; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 4px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; margin-top: 8px; }
+        button#logoutBtn { background: #dc3545; }
+        .toggle-btn { background: none; color: #007bff; border: none; text-decoration: underline; cursor: pointer; margin-top: 10px; width: auto; padding: 0; }
+        .error { color: red; margin-top: 8px; }
+        .success { color: green; margin-top: 8px; }
+        pre { background: #f4f4f4; padding: 12px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+
+    <h2>FastAPI Auth + LangGraph Agent Demo</h2>
+
+    <!-- LOGIN CARD -->
+    <div id="loginCard" class="card">
+        <h3>Log In</h3>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" required placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required placeholder="Enter password">
+            </div>
+            <button type="submit">Log In</button>
+            <div id="loginMsg"></div>
+        </form>
+        <button class="toggle-btn" id="showRegisterBtn">Don't have an account? Register</button>
+    </div>
+
+    <!-- REGISTER CARD -->
+    <div id="registerCard" class="card" style="display: none;">
+        <h3>Register New Account</h3>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="regFullName">Full Name</label>
+                <input type="text" id="regFullName" required placeholder="Jane Doe">
+            </div>
+            <div class="form-group">
+                <label for="regEmail">Email</label>
+                <input type="email" id="regEmail" required placeholder="jane@example.com">
+            </div>
+            <div class="form-group">
+                <label for="regUsername">Username</label>
+                <input type="text" id="regUsername" required placeholder="janedoe">
+            </div>
+            <div class="form-group">
+                <label for="regPassword">Password</label>
+                <input type="password" id="regPassword" required placeholder="Create password">
+            </div>
+            <button type="submit">Create Account</button>
+            <div id="registerMsg"></div>
+        </form>
+        <button class="toggle-btn" id="showLoginBtn">Already have an account? Log In</button>
+    </div>
+
+    <!-- USER PROFILE & LANGGRAPH CARD -->
+    <div id="profileCard" class="card" style="display: none;">
+        <h3>Welcome, <span id="userName"></span>!</h3>
+        <p><strong>Email:</strong> <span id="userEmail"></span> | <strong>Username:</strong> <span id="userId"></span></p>
+        <button id="logoutBtn">Log Out</button>
+
+        <hr style="margin: 1.5rem 0;">
+
+        <h3>Interact with LangGraph Agent</h3>
+        <div class="form-group">
+            <label for="agentPrompt">Prompt for OpenAI via LangGraph:</label>
+            <textarea id="agentPrompt" rows="3" placeholder="e.g. Explain how FastAPIs Async endpoints work in 2 sentences."></textarea>
+        </div>
+        <button id="runAgentBtn" style="background: #28a745;">Run LangGraph Agent</button>
+
+        <h4>Agent Response:</h4>
+        <pre id="apiResult">Enter a prompt above and click "Run LangGraph Agent"...</pre>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
