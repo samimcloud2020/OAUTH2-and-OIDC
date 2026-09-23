@@ -68,3 +68,19 @@ frontend to impersonate the user.
 | **Handling** | Inspected by frontend | Passed along transparently by frontend |
 
 ********************************************************************************************************************
+
+### Open in browser:
+Go to http://localhost:8000/.
+
+Test the lifecycle:
+
+Click Log In: Calls /token, receives id_token and access_token, saves them to localStorage,
+decodes id_token client-side, and shows the profile card.
+
+Refresh the page: localStorage restores the session automatically.
+
+Click Fetch Protected Data: Sends Authorization: Bearer <access_token> to /api/agent and prints the output.
+
+Click Log Out: Clears localStorage and resets the UI.
+
+************************************************************************************************
